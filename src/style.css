@@ -223,6 +223,7 @@ nav{
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 28px;
   max-width:1180px;margin:0 auto;
+  gap:32px;
 }
 .brand{
   font-family:var(--display);font-weight:700;font-size:20px;
