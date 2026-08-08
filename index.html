@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- PWA / Mobile Web App -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#080c22" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f7ff" media="(prefers-color-scheme: light)">
+
+<!-- iOS Safari Web App -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hack-X 2026">
+<link rel="apple-touch-icon" href="/assets/hackx-logo.png">
+
+<!-- Android / General -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Hack-X 2026">
+
+<!-- Open Graph (looks great when shared on WhatsApp, Twitter, etc.) -->
+<meta property="og:title" content="Hack-X 2026 — National Medical Hackathon">
+<meta property="og:description" content="32-hour medical-track hackathon at ADYPU, Pune. Top 3 teams advance to IIT Bombay. Register your team now!">
+<meta property="og:image" content="/assets/hackx-logo.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hack-X 2026 — National Medical Hackathon">
+<meta name="twitter:description" content="32-hour medical-track hackathon at ADYPU, Pune. Top 3 to IIT Bombay.">
+<meta name="twitter:image" content="/assets/hackx-logo.png">
+
+<title>Hack-X 2026 — Innovate · Heal · Impact</title>
+<meta name="description" content="Hack-X 2026: a 32-hour National Medical Hackathon. Phase 01 at Ajeenkya D Y Patil University, Pune. Top 3 teams advance to Phase 02 at IIT Bombay.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- crazy animated background layers -->
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+<div class="orb orb-1" aria-hidden="true"></div>
+<div class="orb orb-2" aria-hidden="true"></div>
+<div class="orb orb-3" aria-hidden="true"></div>
+<div class="orb orb-4" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+
+<header>
+  <nav>
+    <div class="brand-group">
+      <a href="#top" class="brand"><img src="/assets/hackx-logo.png" alt="Hack-X 2026" class="brand-logo"></a>
+      <span class="nav-brand-divider" aria-hidden="true"></span>
+      <div class="nav-org-logos" aria-label="Organizers">
+        <img src="/assets/dypu-logo.png" alt="Ajeenkya D Y Patil University" class="nav-org-logo nav-org-dypu">
+        <img src="/assets/ieee-sb-logo.png" alt="IEEE Student Branch, ADYPU" class="nav-org-logo">
+        <img src="/assets/ieee-mh-logo.png" alt="IEEE Maharashtra Section" class="nav-org-logo">
+        <img src="/assets/ieee-yp-logo.png" alt="IEEE Young Professionals" class="nav-org-logo">
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-links" id="navLinks">
+        <a href="#about">About</a>
+        <a href="#phases">Phases</a>
+        <a href="#sponsors">Sponsors</a>
+        <a href="#register" class="nav-cta" id="navRegisterBtn">Register</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">🌙</button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <!-- compact radar / sonar ping — top-right corner, out of the way of text -->
+    <div class="hero-radar" aria-hidden="true">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- rings -->
+        <circle cx="40" cy="40" r="36" stroke="url(#radarGrad)" stroke-width="1" opacity="0.35"/>
+        <circle cx="40" cy="40" r="24" stroke="url(#radarGrad)" stroke-width="1" opacity="0.25"/>
+        <circle cx="40" cy="40" r="12" stroke="url(#radarGrad)" stroke-width="1" opacity="0.2"/>
+        <!-- cross hairs -->
+        <line x1="40" y1="4"  x2="40" y2="76" stroke="url(#radarGrad)" stroke-width="0.5" opacity="0.2"/>
+        <line x1="4"  y1="40" x2="76" y2="40" stroke="url(#radarGrad)" stroke-width="0.5" opacity="0.2"/>
+        <!-- spinning sweep -->
+        <line id="radarSweep" x1="40" y1="40" x2="40" y2="6" stroke="url(#radarGrad)" stroke-width="1.5" stroke-linecap="round"
+          style="transform-origin:40px 40px; animation:radarSpin 3s linear infinite;"/>
+        <!-- ping blip -->
+        <circle cx="58" cy="26" r="2.5" fill="#00E5A0" opacity="0.8"
+          style="animation:radarBlip 3s ease-out 1.2s infinite;"/>
+        <defs>
+          <linearGradient id="radarGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00E5A0"/>
+            <stop offset="100%" stop-color="#7B6FFF"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="wrap hero-inner">
+      <div class="hero-left">
+        <span class="eyebrow" id="heroEyebrow">PHASE 01 · LIVE AT ADYPU</span>
+        <h1>Hack-X</h1>
+        <p class="tagline">Racing the clock to cure healthcare challenges.</p>
+        <p class="sub">A 32-hour, on-site medical-track hackathon at Ajeenkya D Y Patil University, Pune — hosted by the IEEE ADYPU Student Branch. Top 3 teams advance to Phase 02 at IIT Bombay.</p>
+
+        <div class="cta-row">
+          <a href="#" class="btn btn-primary" id="registerBtn" data-pending>Register your team</a>
+        </div>
+        <div class="live-reg-bar" id="liveRegBar" aria-live="polite" aria-label="Live registration count">
+          <span class="live-reg-dot" aria-hidden="true"></span>
+          <span class="live-reg-label">Teams registered:</span>
+          <span class="live-reg-count" id="liveRegCount">--</span>
+          <span class="live-reg-sep">/</span>
+          <span class="live-reg-max">40</span>
+          <div class="live-reg-track" role="progressbar" aria-valuemin="0" aria-valuemax="40" id="liveRegProgress">
+            <div class="live-reg-fill" id="liveRegFill"></div>
+          </div>
+        </div>
+
+        <div class="vitals">
+          <div class="vital">
+            <div class="label">Duration</div>
+            <div class="value accent">32 HRS</div>
+          </div>
+          <div class="vital">
+            <div class="label">Track</div>
+            <div class="value">Medical / HealthTech</div>
+          </div>
+          <div class="vital">
+            <div class="label">Dates</div>
+            <div class="value" id="dateVital">Late Aug 2026*</div>
+          </div>
+          <div class="vital">
+            <div class="label">Venue</div>
+            <div class="value">ADYPU, Pune</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right" aria-hidden="true">
+        <div class="hero-panel">
+          <div class="panel-header">
+            <span class="panel-live-dot"></span>
+            <span class="panel-live-label">Event Overview</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Duration</span>
+            <span class="panel-stat-val accent">32 Hours</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Format</span>
+            <span class="panel-stat-val">On-site hackathon</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Track</span>
+            <span class="panel-stat-val">Medical / HealthTech</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Team size</span>
+            <span class="panel-stat-val">2 – 4 members</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Phase 01 venue</span>
+            <span class="panel-stat-val">ADYPU, Pune</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Phase 02 venue</span>
+            <span class="panel-stat-val">IIT Bombay</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Advancing teams</span>
+            <span class="panel-stat-val accent">Top 3</span>
+          </div>
+          <div class="panel-stat">
+            <span class="panel-stat-label">Prize pool</span>
+            <span class="panel-stat-val">Announcing soon</span>
+          </div>
+          <div class="panel-footer">
+            <span>Phase 01 · Aug 2026</span>
+            <span class="panel-badge">IEEE ADYPU</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ============ ABOUT ============ -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">the brief</span>
+        <h2>Healthcare doesn't wait. Neither should the fix.</h2>
+      </div>
+
+      <div class="about-grid">
+        <div>
+          <p>Hack-X puts engineering talent against a clock and a chart. Over <strong>32 uninterrupted hours</strong>, teams design and build working solutions to real healthcare and clinical challenges — diagnostics, patient access, hospital workflows, health data, assistive tech, and more.</p>
+          <p>It's organized by <strong>Ajeenkya D Y Patil University</strong> and the <strong>IEEE ADYPU Student Branch</strong>, run as the first of a two-phase format that carries top teams all the way to <strong>IIT Bombay</strong>.</p>
+          <p>No prior healthcare background required — just a team, a problem worth solving, and 32 hours to prove it.</p>
+          <div class="chip-list">
+            <span class="chip">Diagnostics</span>
+            <span class="chip">Patient Access</span>
+            <span class="chip">Hospital Ops</span>
+            <span class="chip">Health Data</span>
+            <span class="chip">Assistive Tech</span>
+            <span class="chip">Public Health</span>
+          </div>
+        </div>
+
+        <div class="diagnosis-card">
+          <div class="row"><span>Format</span><span>On-site hackathon</span></div>
+          <div class="row"><span>Duration</span><span>32 hours</span></div>
+          <div class="row"><span>Track</span><span>Medical / HealthTech</span></div>
+          <div class="row"><span>Phase 01 venue</span><span>Ajeenkya D Y Patil University, Pune</span></div>
+          <div class="row"><span>Phase 02 venue</span><span>IIT Bombay</span></div>
+          <div class="row"><span>Advancing teams</span><span>Top 3</span></div>
+          <div class="row"><span>Prize pool</span><span>Announcing soon</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ============ PHASES ============ -->
+  <section class="section" id="phases">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">the format</span>
+        <h2>Two phases. One shot at IIT Bombay.</h2>
+        <p>Hack-X runs as a qualifier-to-final pipeline — build at ADYPU, and if you're in the top 3, build again on the national stage.</p>
+      </div>
+
+      <div class="phases">
+        <div class="phase active">
+          <div class="phase-num">STAGE<span class="stage">01</span></div>
+          <div class="phase-body">
+            <span class="meta">Qualifier · Ajeenkya D Y Patil University</span>
+            <h3>Phase 01 — The ADYPU Sprint</h3>
+            <p>A 32-hour on-site build at ADYPU, Pune. Teams tackle a medical/healthcare problem statement end-to-end — from diagnosis to working demo — in front of judges from academia and industry.</p>
+          </div>
+        </div>
+        <div class="phase-arrow">↓ &nbsp;top 3 teams advance</div>
+        <div class="phase">
+          <div class="phase-num">STAGE<span class="stage">02</span></div>
+          <div class="phase-body">
+            <span class="meta">Finals · IIT Bombay</span>
+            <h3>Phase 02 — The IIT Bombay Finals</h3>
+            <p>The top 3 teams from Phase 01 travel to IIT Bombay to compete at the national stage. Format, dates, and finals problem statements will be announced closer to Phase 01's conclusion.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ============ SPONSORS ============ -->
+  <section class="section" id="sponsors">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">backing the build</span>
+        <h2>Sponsors</h2>
+        <p>Sponsor slots for Hack-X 2026 are currently open.</p>
+      </div>
+
+      <div class="sponsor-grid">
+        <div class="sponsor-slot">TITLE SPONSOR<br>— open —</div>
+        <div class="sponsor-slot">PLATINUM<br>— open —</div>
+        <div class="sponsor-slot">GOLD<br>— open —</div>
+        <div class="sponsor-slot">IN-KIND<br>— open —</div>
+      </div>
+
+      <div class="sponsor-cta">
+        <p>Want to back a room full of teams building real healthcare solutions in 32 hours? We'll swap these slots for your logo.</p>
+        <a href="mailto:aryan.vaidya@adypu.edu.in?subject=Hack-X%202026%20Sponsorship%20Inquiry" class="btn btn-ghost" id="sponsorMailBtn">Become a sponsor</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="cta-band" id="register">
+    <div class="wrap">
+      <span class="eyebrow" style="justify-content:center;">registration</span>
+      <h2>Your team's clock starts soon.</h2>
+      <p>Secure your spot before slots fill up — registration is open now.</p>
+
+      <div class="cta-row" style="justify-content:center;">
+        <a href="#" class="btn btn-primary" id="registerBtn2" data-pending>Register your team</a>
+      </div>
+
+      <!-- Live count bar (cta-band variant) -->
+      <div class="live-reg-bar live-reg-bar--center" id="liveRegBar2" aria-live="polite" aria-label="Live registration count">
+        <span class="live-reg-dot" aria-hidden="true"></span>
+        <span class="live-reg-label">Teams registered:</span>
+        <span class="live-reg-count" id="liveRegCount2">--</span>
+        <span class="live-reg-sep">/</span>
+        <span class="live-reg-max">40</span>
+        <div class="live-reg-track" role="progressbar" aria-valuemin="0" aria-valuemax="40" id="liveRegProgress2">
+          <div class="live-reg-fill" id="liveRegFill2"></div>
+        </div>
+      </div>
+
+      <!-- Registration instructions -->
+      <div class="reg-instructions" id="regInstructions">
+        <div class="reg-instructions-header">
+          <span class="reg-instructions-icon" aria-hidden="true">📋</span>
+          <span class="reg-instructions-title">Before you register — read carefully</span>
+        </div>
+        <ul class="reg-instructions-list">
+          <li>
+            <span class="reg-inst-icon" aria-hidden="true">⚠️</span>
+            <span><strong>One submission only.</strong> The registration form can be filled only once — double-check all details before submitting.</span>
+          </li>
+          <li>
+            <span class="reg-inst-icon" aria-hidden="true">👤</span>
+            <span><strong>Team leader only.</strong> Registration must be completed by the team leader on behalf of the entire team. Members should not fill the form separately.</span>
+          </li>
+          <li>
+            <span class="reg-inst-icon" aria-hidden="true">📄</span>
+            <span><strong>Problem statements.</strong> Problem statements will be made live on the day of commencement of the hackathon.</span>
+          </li>
+        </ul>
+        <div class="reg-instructions-footer">Happy Coding! 🚀</div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="brand"><img src="/assets/hackx-logo.png" alt="Hack-X 2026" class="brand-logo footer-brand-logo"></a>
+        <p>A 32-hour National Medical Hackathon. Phase 01 at ADYPU, Pune — Phase 02 at IIT Bombay.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Event</h4>
+        <a href="#about">About</a>
+        <a href="#phases">Phases</a>
+        <a href="#sponsors">Sponsors</a>
+      </div>
+      <div class="footer-col">
+        <h4>Organized by</h4>
+        <span>Ajeenkya D Y Patil University</span>
+        <span>IEEE ADYPU Student Branch</span>
+        <span>In collaboration with IIT Bombay</span>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="mailto:aryan.vaidya@adypu.edu.in">aryan.vaidya@adypu.edu.in</a>
+      </div>
+    </div>
+    <hr class="divider" style="margin-bottom:20px;">
+    <div class="footer-bottom">
+      <span>© 2026 Hack-X · IEEE ADYPU Student Branch</span>
+      <span>Dates provisional — subject to confirmation</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

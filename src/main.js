@@ -1,0 +1,359 @@
+import './style.css';
+
+// =====================================================================
+// CONFIG — the only block you should need to touch before deploying.
+// =====================================================================
+const CONFIG = {
+  // TODO: paste your live Google Form link here once it's created
+  registerUrl: "https://forms.gle/1TGR3wAxKFdd9yF68",
+
+  // Google Apps Script Web App URL — returns { count: N }
+  teamCountUrl: "https://script.google.com/macros/s/AKfycbxik4daTZ90Jezg0ZnSqq8O-UpR7bGX_fYGoPN-KgEpMRw3VS0INJdBP2rVpg1aUvm4TQ/exec",
+
+  // Max team slots available
+  teamCountMax: 40,
+
+  // Set to a real date string (e.g. "2026-08-28") once confirmed,
+  // or leave as null to keep showing the provisional label.
+  eventDateISO: null,
+  eventDateLabel: "Late Aug 2026*"
+};
+
+function applyConfig(){
+  const regBtns = [document.getElementById('registerBtn'), document.getElementById('registerBtn2'), document.getElementById('navRegisterBtn')];
+
+  regBtns.forEach(btn=>{
+    if(!btn) return;
+    if(CONFIG.registerUrl){
+      btn.href = CONFIG.registerUrl;
+      btn.removeAttribute('data-pending');
+      btn.target = '_blank';
+      btn.rel = 'noopener';
+    }
+  });
+
+  const dateVital = document.getElementById('dateVital');
+  if(dateVital && CONFIG.eventDateISO){
+    const d = new Date(CONFIG.eventDateISO);
+    dateVital.textContent = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  } else if(dateVital){
+    dateVital.textContent = CONFIG.eventDateLabel;
+  }
+}
+applyConfig();
+
+// =====================================================================
+// LIVE REGISTRATION COUNT
+// =====================================================================
+function animateCounter(el, target, duration = 1100) {
+  const startTime = performance.now();
+  function tick(now) {
+    const p = Math.min((now - startTime) / duration, 1);
+    const eased = p < 1 ? 1 - Math.pow(1 - p, 3) : 1; // ease-out cubic
+    el.textContent = Math.floor(eased * target);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(tick);
+}
+
+async function fetchTeamCount() {
+  const countEl  = document.getElementById('liveRegCount');
+  const fillEl   = document.getElementById('liveRegFill');
+  const trackEl  = document.getElementById('liveRegProgress');
+  // Second instance (CTA band)
+  const countEl2  = document.getElementById('liveRegCount2');
+  const fillEl2   = document.getElementById('liveRegFill2');
+  const trackEl2  = document.getElementById('liveRegProgress2');
+  if (!countEl && !countEl2) return;
+
+  try {
+    const res  = await fetch(CONFIG.teamCountUrl);
+    const data = await res.json();
+    const count = Math.max(0, parseInt(data.count, 10) || 0);
+    const max   = CONFIG.teamCountMax;
+
+    // Helper to update one count+bar pair
+    function updateWidget(cEl, fEl, tEl) {
+      if (cEl) animateCounter(cEl, count);
+      if (fEl) {
+        setTimeout(() => {
+          const pct = Math.min(100, (count / max) * 100).toFixed(1);
+          fEl.style.width = pct + '%';
+          if (count / max >= 0.75) fEl.classList.add('warn');
+          else fEl.classList.remove('warn');
+        }, 80);
+      }
+      if (tEl) {
+        tEl.setAttribute('aria-valuenow', count);
+        tEl.setAttribute('aria-valuetext', `${count} of ${max} teams registered`);
+      }
+    }
+
+    updateWidget(countEl,  fillEl,  trackEl);
+    updateWidget(countEl2, fillEl2, trackEl2);
+
+  } catch (err) {
+    console.warn('[Hack-X] Could not fetch team count:', err);
+    if (countEl  && countEl.textContent  === '--') countEl.textContent  = '?';
+    if (countEl2 && countEl2.textContent === '--') countEl2.textContent = '?';
+  }
+}
+
+// Fetch immediately, then refresh every 60 s
+fetchTeamCount();
+setInterval(fetchTeamCount, 60_000);
+
+
+
+// mobile nav toggle
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
+navToggle.addEventListener('click', ()=>{
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('click', ()=> navLinks.classList.remove('open'));
+});
+
+// =====================================================================
+// THEME TOGGLE — light / dark, persisted in localStorage
+// =====================================================================
+const THEME_KEY = 'hackx-theme';
+const html = document.documentElement;
+
+// Apply saved theme immediately (before first paint)
+const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+html.setAttribute('data-theme', savedTheme);
+
+const themeToggle = document.getElementById('themeToggle');
+function syncToggleIcon(){
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  themeToggle.textContent = isDark ? '🌙' : '☀️';
+  themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+}
+syncToggleIcon();
+
+themeToggle.addEventListener('click', ()=>{
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem(THEME_KEY, next);
+  syncToggleIcon();
+});
+
+// Expose current theme for canvas engine
+window.getHackxTheme = () => html.getAttribute('data-theme');
+
+
+
+// Radar SVG animation is driven purely by CSS @keyframes (radarSpin / radarBlip).
+// No JS needed for it. prefersReduced used below for the canvas engine only.
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// =====================================================================
+// PREMIUM BACKGROUND ENGINE
+// • Layer 1 — Aurora sine waves (canvas, fixed, full-viewport)
+// • Layer 2 — Constellation dots + mouse-reactive lines
+// • Layer 3 — Floating medical cross / DNA-helix particles
+// All drawn below z-index -2 so they never sit on top of text.
+// =====================================================================
+function initBackground(){
+  const canvas = document.getElementById('bgCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let W, H, dpr, mouse = {x: -9999, y: -9999};
+  let raf;
+  let t = 0;
+
+  // ── resize ──────────────────────────────────────────────────────────
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    rebuildParticles();
+  }
+
+  // ── particles ───────────────────────────────────────────────────────
+  const COLORS = ['#FF3B5C','#00E5A0','#FFB627','#7B6FFF'];
+  let dots = [], crosses = [];
+
+  function rebuildParticles(){
+    const n = Math.min(90, Math.floor(W * H / 14000));
+    dots = Array.from({length: n}, () => ({
+      x:  Math.random() * W,  y: Math.random() * H,
+      vx: (Math.random() - .5) * .28, vy: (Math.random() - .5) * .28,
+      r:  Math.random() * 3 + 1.5,          // was 1.8 + .5 — now 3x bigger
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      pulse: Math.random() * Math.PI * 2
+    }));
+
+    const nc = Math.min(28, Math.floor(W * H / 50000));
+    crosses = Array.from({length: nc}, () => ({
+      x:  Math.random() * W,  y: Math.random() * H,
+      vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .18,
+      size: Math.random() * 20 + 16,        // was 10+6 — now 16–36px
+      alpha: Math.random() * .28 + .12,     // was .18+.06 — more visible
+      rot: Math.random() * Math.PI,
+      rotV: (Math.random() - .5) * .006,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)]
+    }));
+  }
+
+  // ── aurora wave helper ──────────────────────────────────────────────
+  function drawAurora(yBase, amp, freq, phase, color, alpha){
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const grad = ctx.createLinearGradient(0, yBase - amp, 0, yBase + amp * 2);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for(let x = 0; x <= W; x += 4){
+      const y = yBase + Math.sin(x * freq + phase) * amp
+                       + Math.sin(x * freq * .6 + phase * 1.3) * (amp * .45)
+                       + Math.sin(x * freq * .3 + phase * .7) * (amp * .25);
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── medical cross ──────────────────────────────────────────────────
+  function drawCross(x, y, size, rot, color, alpha){
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = size * .22;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-size * .5, 0); ctx.lineTo(size * .5, 0);
+    ctx.moveTo(0, -size * .5); ctx.lineTo(0, size * .5);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── main loop ───────────────────────────────────────────────────────
+  function frame(){
+    ctx.clearRect(0, 0, W, H);
+    t += .004;
+
+    const isLight = (typeof window.getHackxTheme === 'function')
+      && window.getHackxTheme() === 'light';
+
+    // === AURORA WAVES (back layer) ===
+    if(isLight){
+      drawAurora(H * .22, H * .18, .0014, t * .9,          '#FF3B5C', .07);
+      drawAurora(H * .55, H * .22, .0011, t * .7 + 2.1,    '#7B6FFF', .065);
+      drawAurora(H * .78, H * .16, .0016, t * 1.1 + 4.5,   '#00C988', .06);
+      drawAurora(H * .38, H * .13, .0009, t * .55 + 1.2,   '#FFB627', .055);
+    } else {
+      drawAurora(H * .22, H * .18, .0014, t * .9,          '#FF3B5C', .055);
+      drawAurora(H * .55, H * .22, .0011, t * .7 + 2.1,    '#7B6FFF', .05);
+      drawAurora(H * .78, H * .16, .0016, t * 1.1 + 4.5,   '#00E5A0', .048);
+      drawAurora(H * .38, H * .13, .0009, t * .55 + 1.2,   '#FFB627', .038);
+    }
+
+    // === CONSTELLATION LINES ===
+    const lineColor  = isLight ? '#0070c0' : '#00E5A0';
+    const mouseColor = isLight ? '#d97000' : '#FFB627';
+    const lineAlpha  = isLight ? .06 : .09;
+    const mouseAlpha = isLight ? .08 : .12;
+
+    for(let i = 0; i < dots.length; i++){
+      for(let j = i + 1; j < dots.length; j++){
+        const a = dots[i], b = dots[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.hypot(dx, dy);
+        if(dist < 130){
+          ctx.save();
+          ctx.globalAlpha = lineAlpha * (1 - dist / 130);
+          ctx.strokeStyle = lineColor;
+          ctx.lineWidth = .7;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          ctx.restore();
+        }
+      }
+      // mouse-reactive halo
+      const md = Math.hypot(dots[i].x - mouse.x, dots[i].y - mouse.y);
+      if(md < 180){
+        ctx.save();
+        ctx.globalAlpha = mouseAlpha * (1 - md / 180);
+        ctx.strokeStyle = mouseColor;
+        ctx.lineWidth = .8;
+        ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y);
+        ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // === GLOWING DOTS ===
+    for(const p of dots){
+      p.x += p.vx; p.y += p.vy;
+      p.pulse += .025;
+      if(p.x < 0 || p.x > W) p.vx *= -1;
+      if(p.y < 0 || p.y > H) p.vy *= -1;
+      const pulse = .55 + .45 * Math.sin(p.pulse);
+      const dotAlpha = isLight ? .85 * pulse : .7 * pulse;
+      const dotBlur  = isLight ? 10 * pulse  : 16 * pulse;
+      ctx.save();
+      ctx.shadowBlur = dotBlur;
+      ctx.shadowColor = p.color;
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = dotAlpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * (.85 + .35 * pulse), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // === MEDICAL CROSS PARTICLES ===
+    for(const c of crosses){
+      c.x += c.vx; c.y += c.vy;
+      c.rot += c.rotV;
+      if(c.x < -30 || c.x > W + 30) c.vx *= -1;
+      if(c.y < -30 || c.y > H + 30) c.vy *= -1;
+      drawCross(c.x, c.y, c.size, c.rot, c.color, isLight ? c.alpha * 1.8 : c.alpha);
+    }
+
+    raf = requestAnimationFrame(frame);
+  }
+
+  // ── mouse tracking ──────────────────────────────────────────────────
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, {passive:true});
+  window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  // ── kick off ────────────────────────────────────────────────────────
+  resize();
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 200);
+  });
+  frame();
+}
+
+if(!prefersReduced){
+  initBackground();
+} else {
+  // Reduced motion: just fill the canvas with the base background color,
+  // no animation, so it doesn't sit blank/transparent.
+  const canvas = document.getElementById('bgCanvas');
+  if(canvas){
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.fillStyle = '#0A0E27';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
