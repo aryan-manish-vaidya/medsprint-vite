@@ -239,6 +239,18 @@ nav{
   flex-shrink:0;
 }
 .nav-org-dypu{height:32px;}
+.nav-org-iitb{
+  height:38px;
+  /* In dark mode: screen blend removes white bg, leaving only the blue emblem */
+  mix-blend-mode:screen;
+  filter:brightness(1.1) contrast(1);
+  border-radius:4px;
+}
+[data-theme="light"] .nav-org-iitb{
+  mix-blend-mode:normal;
+  filter:none;
+  background:transparent;
+}
 @media(max-width:820px){
   .nav-org-logos{display:none;}
   .nav-brand-divider{display:none;}
