@@ -25,17 +25,29 @@ const CONFIG = {
 };
 
 function applyConfig(){
-  const regBtns = [document.getElementById('registerBtn'), document.getElementById('registerBtn2'), document.getElementById('navRegisterBtn')];
+  // Hero button — scroll down to the registration section (never redirect to form)
+  const heroBtn = document.getElementById('registerBtn');
+  if(heroBtn){
+    heroBtn.href = '#register';
+    heroBtn.removeAttribute('data-pending');
+    heroBtn.removeAttribute('target');
+    heroBtn.removeAttribute('rel');
+    heroBtn.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
 
-  regBtns.forEach(btn=>{
-    if(!btn) return;
+  // CTA-band button (inside the #register section) — links to the actual form
+  const ctaBtn = document.getElementById('registerBtn2');
+  if(ctaBtn){
     if(CONFIG.registerUrl){
-      btn.href = CONFIG.registerUrl;
-      btn.removeAttribute('data-pending');
-      btn.target = '_blank';
-      btn.rel = 'noopener';
+      ctaBtn.href = CONFIG.registerUrl;
+      ctaBtn.removeAttribute('data-pending');
+      ctaBtn.target = '_blank';
+      ctaBtn.rel = 'noopener';
     }
-  });
+  }
 
   const dateVital = document.getElementById('dateVital');
   if(dateVital && CONFIG.eventDateISO){
