@@ -1,4 +1,9 @@
 import './style.css';
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Analytics (tracks visitors on Vercel Dashboard)
+inject();
+
 
 // =====================================================================
 // CONFIG — the only block you should need to touch before deploying.
