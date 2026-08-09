@@ -656,9 +656,7 @@ nav{
   border:1px solid rgba(255,255,255,0.08);
   border-radius:var(--radius);
   overflow:hidden;
-  background:rgba(11, 16, 33, 0.75);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
+  background:transparent;
   box-shadow:0 8px 32px rgba(0,0,0,0.15);
 }
 .vital{
@@ -680,6 +678,12 @@ nav{
 .vital:nth-child(2) .value { color: #00ffaa; text-shadow: 0 0 12px rgba(0, 255, 170, 0.4); } /* Neon Green */
 .vital:nth-child(3) .value { color: #ffd700; text-shadow: 0 0 12px rgba(255, 215, 0, 0.4); } /* Neon Gold */
 .vital:nth-child(4) .value { color: #ff4455; text-shadow: 0 0 12px rgba(255, 68, 85, 0.4); } /* Neon Red */
+
+/* Light mode: force all vital values to neon violet */
+[data-theme="light"] .vital .value {
+  color: #b46dff;
+  text-shadow: 0 0 12px rgba(180, 109, 255, 0.4);
+}
 @media(max-width:720px){
   .vitals{grid-template-columns:repeat(2,1fr);}
   .vital{border-right:1px solid rgba(255,255,255,0.08);}
