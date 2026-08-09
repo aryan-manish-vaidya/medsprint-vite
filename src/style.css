@@ -932,8 +932,7 @@ footer{padding:36px 0 28px;}
 }
 .footer-col a:hover{color:var(--pulse);}
 /* ── contact grid (2 col) ── */
-.footer-col--contact{flex:1;min-width:260px;}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+.contact-grid{display:grid;grid-template-columns:auto auto;gap:0 32px;}
 .contact-group{display:flex;flex-direction:column;gap:0;}
 .footer-col--contact .contact-group a {
   display: block;
