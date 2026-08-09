@@ -628,12 +628,12 @@ nav{
   border-radius:var(--radius);
   overflow:hidden;
   background:var(--surface);
-  transition:background .4s, border-color .4s;
+  transition:background-color .35s, border-color .35s;
 }
 .vital{
   padding:20px 22px;
   border-right:1px solid var(--line);
-  transition:border-color .4s;
+  transition:border-color .35s;
 }
 .vital:last-child{border-right:none;}
 .vital .label{
@@ -654,7 +654,12 @@ nav{
 }
 
 /* ---------- SECTION HEADERS ---------- */
-.section{padding:88px 0;}
+.section{
+  padding:88px 0;
+  /* Skip rendering sections outside the viewport — big win on long pages */
+  content-visibility:auto;
+  contain-intrinsic-size:0 600px;
+}
 .section-head{max-width:640px;margin-bottom:52px;}
 .section-head h2{
   font-size:clamp(30px,4.4vw,44px);

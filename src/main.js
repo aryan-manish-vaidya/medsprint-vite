@@ -170,12 +170,12 @@ setInterval(fetchTeamCount, 60_000);
 
 // mobile nav toggle
 const navToggle = document.getElementById('navToggle');
-const navLinks = document.getElementById('navLinks');
-navToggle.addEventListener('click', ()=>{
+const navLinks  = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => {
   navLinks.classList.toggle('open');
-});
-navLinks.querySelectorAll('a').forEach(a=>{
-  a.addEventListener('click', ()=> navLinks.classList.remove('open'));
+}, { passive: true });
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => navLinks.classList.remove('open'), { passive: true });
 });
 
 // =====================================================================
@@ -196,11 +196,14 @@ function syncToggleIcon(){
 }
 syncToggleIcon();
 
-themeToggle.addEventListener('click', ()=>{
+themeToggle.addEventListener('click', () => {
   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem(THEME_KEY, next);
-  syncToggleIcon();
+  // Batch the DOM write inside rAF to avoid forced layout on the click frame
+  requestAnimationFrame(() => {
+    html.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+    syncToggleIcon();
+  });
 });
 
 // Expose current theme for canvas engine
@@ -230,7 +233,9 @@ function initBackground(){
 
   // ── resize ──────────────────────────────────────────────────────────
   function resize(){
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Cap DPR at 1.5 on mobile to halve the pixel budget on Retina phones
+    const isMobile = window.innerWidth <= 820;
+    dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
     W = window.innerWidth;
     H = window.innerHeight;
     canvas.width  = W * dpr;
@@ -244,23 +249,27 @@ function initBackground(){
   // ── particles ───────────────────────────────────────────────────────
   const COLORS = ['#FF3B5C','#00E5A0','#FFB627','#7B6FFF'];
   let dots = [], crosses = [];
+  // Fewer particles on mobile = less draw-call overhead
+  const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
   function rebuildParticles(){
-    const n = Math.min(90, Math.floor(W * H / 14000));
+    const cap = isMobileDevice ? 40 : 90;
+    const n = Math.min(cap, Math.floor(W * H / 14000));
     dots = Array.from({length: n}, () => ({
       x:  Math.random() * W,  y: Math.random() * H,
       vx: (Math.random() - .5) * .28, vy: (Math.random() - .5) * .28,
-      r:  Math.random() * 3 + 1.5,          // was 1.8 + .5 — now 3x bigger
+      r:  Math.random() * 3 + 1.5,
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       pulse: Math.random() * Math.PI * 2
     }));
 
-    const nc = Math.min(28, Math.floor(W * H / 50000));
+    const crossCap = isMobileDevice ? 8 : 28;
+    const nc = Math.min(crossCap, Math.floor(W * H / 50000));
     crosses = Array.from({length: nc}, () => ({
       x:  Math.random() * W,  y: Math.random() * H,
       vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .18,
-      size: Math.random() * 20 + 16,        // was 10+6 — now 16–36px
-      alpha: Math.random() * .28 + .12,     // was .18+.06 — more visible
+      size: Math.random() * 20 + 16,
+      alpha: Math.random() * .28 + .12,
       rot: Math.random() * Math.PI,
       rotV: (Math.random() - .5) * .006,
       color: COLORS[Math.floor(Math.random() * COLORS.length)]
@@ -392,16 +401,28 @@ function initBackground(){
   }
 
   // ── mouse tracking ──────────────────────────────────────────────────
-  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, {passive:true});
-  window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+  window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; }, { passive: true });
+  // Touch: treat touch position as mouse for constellation lines
+  window.addEventListener('touchmove', e => {
+    if (e.touches.length > 0) { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; }
+  }, { passive: true });
+  window.addEventListener('touchend', () => { mouse.x = -9999; mouse.y = -9999; }, { passive: true });
+
+  // ── pause RAF when tab is hidden (saves battery & prevents jank on switch) ──
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { cancelAnimationFrame(raf); }
+    else { frame(); }
+  }, { passive: true });
 
   // ── kick off ────────────────────────────────────────────────────────
   resize();
   let resizeTimer;
   window.addEventListener('resize', () => {
+    cancelAnimationFrame(raf);
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resize, 200);
-  });
+    resizeTimer = setTimeout(() => { resize(); frame(); }, 250);
+  }, { passive: true });
   frame();
 }
 
