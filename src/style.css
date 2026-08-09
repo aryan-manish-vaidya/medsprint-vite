@@ -642,10 +642,14 @@ nav{
   margin-bottom:7px;
 }
 .vital .value{
-  font-family:var(--display);font-weight:700;font-size:19px;
-  color:var(--text);
+  font-family:var(--display);font-weight:700;font-size:22px;
+  line-height:1.2;
 }
-.vital .value.accent{color:var(--pulse);}
+/* Neon colors per vital */
+.vital:nth-child(1) .value { color: #b46dff; text-shadow: 0 0 12px rgba(180, 109, 255, 0.4); } /* Neon Violet */
+.vital:nth-child(2) .value { color: #00ffaa; text-shadow: 0 0 12px rgba(0, 255, 170, 0.4); } /* Neon Green */
+.vital:nth-child(3) .value { color: #ffd700; text-shadow: 0 0 12px rgba(255, 215, 0, 0.4); } /* Neon Gold */
+.vital:nth-child(4) .value { color: #ff4455; text-shadow: 0 0 12px rgba(255, 68, 85, 0.4); } /* Neon Red */
 @media(max-width:720px){
   .vitals{grid-template-columns:repeat(2,1fr);}
   .vital{border-right:1px solid var(--line);}
