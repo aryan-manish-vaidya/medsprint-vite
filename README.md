@@ -84,6 +84,3 @@ To add additional sponsor or partner logos (such as IIT Bombay):
 1. Place the image file in the `public/assets/` directory.
 2. Update `index.html` by adding an `<img>` tag in the corresponding section (e.g., inside the `.org-strip`).
 
-## 📄 License
-
-Distributed under the MIT License.
