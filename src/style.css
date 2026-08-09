@@ -78,9 +78,9 @@ section{position:relative;}
 }
 
 .wrap{
-  max-width:1180px;
+  max-width:1400px;
   margin:0 auto;
-  padding:0 28px;
+  padding:0 16px;
 }
 
 .eyebrow{
@@ -902,71 +902,117 @@ footer{padding:56px 0 40px;}
   .orb-1,.orb-2,.orb-3{display:none;}
 }
 
-/* ── Content Wall / IG Placeholders ── */
-.content-wall-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-top: 40px;
+/* ── Content Wall / IG Handle ── */
+.ig-handle-container {
+  text-align: center;
+  padding: 60px 0 40px;
 }
-.ig-placeholder {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease, border-color 0.3s ease;
+.ig-handle {
+  font-family: var(--display);
+  font-size: clamp(48px, 8vw, 84px);
+  font-weight: 700;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: transform 0.3s, filter 0.3s;
+  display: inline-block;
+  text-decoration: none;
 }
-.ig-placeholder:hover {
-  transform: translateY(-5px);
-  border-color: var(--crimson);
+.ig-handle:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 20px rgba(220,39,67,0.4));
 }
-.ig-header {
-  display: flex;
+
+/* =====================================================================
+   COUNTDOWN TIMER
+   ===================================================================== */
+.countdown-wrap {
+  margin: 36px auto 0;
+  text-align: center;
+}
+.countdown-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.countdown-grid {
+  display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
-}
-.ig-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  position: relative;
-}
-.ig-avatar::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 2px solid var(--surface);
-}
-.ig-username {
-  font-family: var(--mono);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text);
-}
-.ig-media {
-  width: 100%;
-  aspect-ratio: 4/5;
-  background: var(--bg);
-  border-radius: 8px;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
 }
-.ig-media::before {
-  content: '▶';
-  font-size: 32px;
-  color: rgba(255,255,255,0.2);
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid rgba(123,111,255,0.25);
+  border-radius: 16px;
+  padding: 22px 28px;
+  min-width: 100px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 0 0 1px rgba(123,111,255,0.08),
+    0 8px 32px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  transition: border-color .3s, box-shadow .3s;
 }
-.ig-caption {
-  font-size: 14px;
-  color: var(--text-dim);
-  line-height: 1.4;
+.countdown-unit:hover {
+  border-color: rgba(123,111,255,0.5);
+  box-shadow:
+    0 0 18px rgba(123,111,255,0.3),
+    0 8px 32px rgba(0,0,0,0.22);
+}
+.countdown-value {
+  font-family: var(--display);
+  font-size: clamp(36px, 6vw, 58px);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  min-width: 2ch;
+  text-align: center;
+  transition: color .3s;
+}
+.countdown-unit:nth-child(7) .countdown-value { /* Seconds */
+  color: var(--violet);
+  animation: cdSecondsPulse 1s ease-in-out infinite;
+}
+@keyframes cdSecondsPulse {
+  0%, 100% { text-shadow: 0 0 8px rgba(123,111,255,0.4); }
+  50%       { text-shadow: 0 0 20px rgba(123,111,255,0.85), 0 0 40px rgba(123,111,255,0.4); }
+}
+.countdown-unit-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.countdown-sep {
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  color: var(--text-faint);
+  line-height: 1;
+  margin-bottom: 18px; /* align with value, offset for label */
+  user-select: none;
+}
+/* finished state */
+.countdown-wrap.finished .countdown-value {
+  color: var(--pulse);
+}
+[data-theme="light"] .countdown-unit {
+  border-color: rgba(90,79,212,0.2);
+  background: rgba(90,79,212,0.05);
+}
+@media(max-width:600px) {
+  .countdown-unit { min-width: 72px; padding: 16px 14px; }
+  .countdown-sep  { font-size: 24px; }
 }

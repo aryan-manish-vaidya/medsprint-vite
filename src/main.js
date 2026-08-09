@@ -21,7 +21,7 @@ const CONFIG = {
   // Set to a real date string (e.g. "2026-08-28") once confirmed,
   // or leave as null to keep showing the provisional label.
   eventDateISO: null,
-  eventDateLabel: "Late Aug 2026*"
+  eventDateLabel: "29th - 30th August 2026"
 };
 
 function applyConfig(){
@@ -120,6 +120,51 @@ async function fetchTeamCount() {
 // Fetch immediately, then refresh every 60 s
 fetchTeamCount();
 setInterval(fetchTeamCount, 60_000);
+
+// =====================================================================
+// COUNTDOWN TIMER — counts down to 29th August 2026 00:00:00 IST
+// =====================================================================
+(function initCountdown() {
+  const TARGET = new Date('2026-08-29T00:00:00+05:30').getTime();
+
+  const cdDays    = document.getElementById('cdDays');
+  const cdHours   = document.getElementById('cdHours');
+  const cdMinutes = document.getElementById('cdMinutes');
+  const cdSeconds = document.getElementById('cdSeconds');
+  const cdWrap    = document.getElementById('countdownWrap');
+
+  if (!cdDays || !cdHours || !cdMinutes || !cdSeconds) return;
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    const now  = Date.now();
+    const diff = TARGET - now;
+
+    if (diff <= 0) {
+      cdDays.textContent    = '00';
+      cdHours.textContent   = '00';
+      cdMinutes.textContent = '00';
+      cdSeconds.textContent = '00';
+      cdWrap?.classList.add('finished');
+      return; // stop ticking
+    }
+
+    const days    = Math.floor(diff / 86_400_000);
+    const hours   = Math.floor((diff % 86_400_000) / 3_600_000);
+    const minutes = Math.floor((diff % 3_600_000)  / 60_000);
+    const seconds = Math.floor((diff % 60_000)     / 1_000);
+
+    cdDays.textContent    = pad(days);
+    cdHours.textContent   = pad(hours);
+    cdMinutes.textContent = pad(minutes);
+    cdSeconds.textContent = pad(seconds);
+
+    setTimeout(tick, 1000);
+  }
+
+  tick();
+})();
 
 
 
