@@ -376,7 +376,7 @@ nav{
   display:grid;
   grid-template-columns:1fr 380px;
   gap:48px;
-  align-items:center;
+  align-items:start;
   max-width:100%;
 }
 .hero-left{
