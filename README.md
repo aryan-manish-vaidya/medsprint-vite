@@ -1,50 +1,89 @@
-# MedSprint — Vite project
+# Hack-X 2026 – Medical Devices Hackathon 🚀
 
-Converted from the static single-file `index.html` to a proper Vite project.
+A modern, high-performance landing page for the **Hack-X 2026 Medical Devices Hackathon**, built with [Vite](https://vitejs.dev/), vanilla JavaScript, and CSS.
 
-## Run it
+Hack-X is a 36-hour national-level innovation challenge where students, developers, and healthcare enthusiasts collaborate to prototype real-world medical device solutions. Phase 01 takes place at Ajeenkya D Y Patil University, Pune, and Phase 02 at IIT Bombay.
 
+## ✨ Features
+
+- **Blazing Fast Performance**: Powered by Vite for instant server starts and optimized production builds.
+- **Dynamic Theming**: First-class support for both Light and Dark modes with seamless transitions and persisted user preferences.
+- **Interactive UI**: Custom neon glow effects, glassmorphism panels, and a sleek, modern aesthetic.
+- **Animated Particle Background**: A responsive canvas-based particle network with drifting orbs that gracefully respects `prefers-reduced-motion` settings.
+- **Live Event Countdown**: Real-time countdown timer accurately tracking the event start date.
+- **Fully Responsive**: Carefully crafted to look perfect on mobile devices, tablets, and desktop displays.
+
+## 🛠️ Tech Stack
+
+- **HTML5**: Semantic markup.
+- **CSS3**: Modern CSS features including custom properties (variables), grid, flexbox, and keyframe animations.
+- **JavaScript (ES6+)**: Vanilla JS for particle animations, countdown logic, and theme toggling.
+- **Vite**: Next-generation frontend tooling.
+
+## 🚀 Getting Started
+
+To get a local copy up and running, follow these simple steps.
+
+### Prerequisites
+
+You will need [Node.js](https://nodejs.org/) installed on your machine.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/hack-x-2026.git
+   ```
+2. Navigate into the project directory:
+   ```bash
+   cd hack-x-2026
+   ```
+3. Install the dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open your browser and visit the local URL provided by Vite (usually `http://localhost:5173`).
+
+### Building for Production
+
+To create an optimized production build, run:
 ```bash
-npm install
-npm run dev
+npm run build
+```
+This will output the compiled assets into the `dist/` directory, ready to be deployed to your favorite hosting provider (Vercel, Netlify, GitHub Pages, etc.).
+
+You can preview the production build locally with:
+```bash
+npm run preview
 ```
 
-Then open the local URL Vite prints (usually http://localhost:5173).
+## ⚙️ Configuration
 
-Build for production:
+Before deploying, make sure to update the configuration variables located at the top of `src/main.js`:
 
-```bash
-npm run build   # outputs to dist/
-npm run preview # preview the production build locally
+```javascript
+const CONFIG = {
+  // Update with the actual Google Form or registration link
+  registerUrl: 'https://forms.gle/...',
+  
+  // The official GitHub repository for project submissions
+  submissionRepoUrl: 'https://github.com/...',
+  
+  // Event start date for the countdown timer
+  eventDateISO: '2026-08-29T09:00:00+05:30'
+};
 ```
 
-## What changed from the original
+## 🤝 Adding Partner Logos
 
-- **Structure**: split the single HTML file into `index.html` (markup only),
-  `src/style.css` (all styles), and `src/main.js` (all behavior), the standard
-  Vite layout.
-- **Logo bug fixed**: the original HTML pointed at `assets/dypu-logo.png` etc.,
-  but no `assets/` folder shipped in the zip — the logo `<img>` tags were
-  broken (404s) wherever it was actually deployed. The four PNGs are now in
-  `public/assets/` and the paths point at `/assets/...`, which Vite serves
-  correctly both in dev and in the production build. All four PNGs
-  themselves are valid, undamaged images (verified: `dypu-logo.png` 481×139,
-  `ieee-sb-logo.png` 592×286, `ieee-mh-logo.png` 886×163, `ieee-yp-logo.png`
-  792×180) — it was only the path that was wrong.
-- **Neon glow buttons**: `.btn-primary` and `.btn-ghost` now carry layered
-  colored `box-shadow` glows with a slow pulse animation, intensifying on
-  hover.
-- **Animated background**: three blurred, slowly-drifting color "orbs"
-  (`.orb-1/2/3`), a subtle animated scanline overlay, and a canvas-based
-  particle field (`#bgCanvas`, driven by `initParticleBackground()` in
-  `src/main.js`) with glowing dots that drift and connect with faint lines.
-  Everything in this section respects `prefers-reduced-motion` and is
-  disabled/frozen for users who have that setting on.
-- **CONFIG block preserved**: `registerUrl`, `submissionRepoUrl`, and
-  `eventDateISO` still live at the top of `src/main.js` — same as before,
-  edit those before you deploy.
+To add additional sponsor or partner logos (such as IIT Bombay):
+1. Place the image file in the `public/assets/` directory.
+2. Update `index.html` by adding an `<img>` tag in the corresponding section (e.g., inside the `.org-strip`).
 
-## If you add the IIT Bombay logo later
+## 📄 License
 
-Drop the file into `public/assets/`, then add an `<img>` tag next to the
-others in the `.org-strip` block in `index.html`.
+Distributed under the MIT License.
