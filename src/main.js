@@ -191,7 +191,7 @@ html.setAttribute('data-theme', savedTheme);
 const themeToggle = document.getElementById('themeToggle');
 function syncToggleIcon(){
   const isDark = html.getAttribute('data-theme') === 'dark';
-  themeToggle.textContent = isDark ? '🌙' : '☀️';
+  themeToggle.textContent = isDark ? '☀️' : '🌙';
   themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
 }
 syncToggleIcon();
