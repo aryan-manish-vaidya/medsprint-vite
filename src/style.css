@@ -794,7 +794,6 @@ nav{
   padding:34px 0;
   border-top:1px solid var(--line);
 }
-.phases .phase:last-child{border-bottom:1px solid var(--line);}
 .phase-num{
   font-family:var(--mono);font-size:14px;color:var(--text-faint);
   padding-top:4px;
