@@ -681,7 +681,8 @@ nav{
 
 /* vitals strip */
 .vitals{
-  margin-top:52px;
+  margin:52px auto 0;
+  max-width:1060px;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   border:1px solid rgba(255,255,255,0.08);
